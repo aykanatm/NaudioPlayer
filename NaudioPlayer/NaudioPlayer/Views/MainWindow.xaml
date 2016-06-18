@@ -16,19 +16,44 @@
                 <MenuItem Header="Exit" Command="{Binding ExitApplicationCommand}"></MenuItem>
             </MenuItem>
             <MenuItem Header="Media">
-                <MenuItem Header="Add File to Playlist..." Command="{Binding AddFileToPlaylist}"/>
-                <MenuItem Header="Add Directory to Playlist..." Command="{Binding AddDirectoryToPlaylistCommand}"/>
+                <MenuItem Header="Add File to Playlist..." Command="{Binding AddFileToPlaylistCommand}"/>
+                <MenuItem Header="Add Folder to Playlist..." Command="{Binding AddFolderToPlaylistCommand}"/>
             </MenuItem>
         </Menu>
+        <Grid DockPanel.Dock="Bottom" Height="30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="30"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Margin="3" Command="{Binding RewindToStartCommand}">
+                <TextBlock Text="Rewind To Beginning"></TextBlock>
+            </Button>
+            <Button Grid.Column="1" Margin="3" Command="{Binding StartPlaybackCommand}">
+                <TextBlock Text="Play/Pause"></TextBlock>
+            </Button>
+            <Button Grid.Column="2" Margin="3" Command="{Binding StopPlaybackCommand}">
+                <TextBlock Text="Stop"></TextBlock>
+            </Button>
+            <Button Grid.Column="3" Margin="3" Command="{Binding ForwardToEndCommand}">
+                <TextBlock Text="Forward to End"></TextBlock>
+            </Button>
+            <Button Grid.Column="5" Margin="3" Command="{Binding ShuffleCommand}">
+                <TextBlock Text="Shuffle"></TextBlock>
+            </Button>
+        </Grid>
         <Grid DockPanel.Dock="Bottom" Margin="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Slider Grid.Column="0" Minimum="0" Maximum="{Binding CurrentTrack.Lenght}" Value="{Binding CurrentTrack.Value}" x:Name="TrackControl"/>
-            <Slider Grid.Column="1" Minimum="0" Maximum="200" Value="{Binding CurrentVolume}" x:Name="VolumeControl"/>
+            <Slider Grid.Column="0" Minimum="0" Maximum="{Binding CurrentTrack.Lenght}" Value="{Binding CurrentTrack.Value, Mode=TwoWay}" x:Name="TrackControl"/>
+            <Slider Grid.Column="1" Minimum="0" Maximum="200" Value="{Binding CurrentVolume, Mode=TwoWay}" x:Name="VolumeControl"/>
         </Grid>
-        <ListView x:Name="Playlist" ItemsSource="{Binding Playlist}" SelectedItem="{Binding CurrentTrack}">
+        <ListView x:Name="Playlist" ItemsSource="{Binding Playlist}" SelectedItem="{Binding CurrentTrack, Mode=TwoWay}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid>
