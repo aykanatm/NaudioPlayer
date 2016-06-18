@@ -10,7 +10,37 @@
     <Window.DataContext>
         <viewModels:MainWindowViewModel/>
     </Window.DataContext>
-    <Grid>
-        
-    </Grid>
+    <DockPanel LastChildFill="True">
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="Exit" Command="{Binding ExitApplicationCommand}"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="Media">
+                <MenuItem Header="Add File to Playlist..." Command="{Binding AddFileToPlaylist}"/>
+                <MenuItem Header="Add Directory to Playlist..." Command="{Binding AddDirectoryToPlaylistCommand}"/>
+            </MenuItem>
+        </Menu>
+        <Grid DockPanel.Dock="Bottom" Margin="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Slider Grid.Column="0" Minimum="0" Maximum="{Binding CurrentTrack.Lenght}" Value="{Binding CurrentTrack.Value}" x:Name="TrackControl"/>
+            <Slider Grid.Column="1" Minimum="0" Maximum="200" Value="{Binding CurrentVolume}" x:Name="VolumeControl"/>
+        </Grid>
+        <ListView x:Name="Playlist" ItemsSource="{Binding Playlist}" SelectedItem="{Binding CurrentTrack}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Path=FriendlyName, Mode=OneWay}"></TextBlock>
+                        <TextBlock Grid.Column="1" Text="{Binding Path=FriendlyLenght, Mode=OneWay}"></TextBlock>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </DockPanel>
 </Window>
