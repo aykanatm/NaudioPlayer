@@ -34,7 +34,7 @@
                 <Image Source="../Images/skip_previous.png" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             </Button>
             <Button Grid.Column="1" Margin="3" Command="{Binding StartPlaybackCommand}">
-                <Image Source="../Images/play.png" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <Image Source="{Binding PlayPauseImageSource}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             </Button>
             <Button Grid.Column="2" Margin="3" Command="{Binding StopPlaybackCommand}">
                 <Image Source="../Images/stop.png" VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -53,7 +53,7 @@
                 <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Slider Grid.Column="0" Minimum="0" Maximum="{Binding CurrentTrackLenght, Mode=OneWay}" Value="{Binding CurrentTrackPosition, Mode=OneWay}" x:Name="TrackControl" VerticalAlignment="Center">
+            <Slider Grid.Column="0" Minimum="0" Maximum="{Binding CurrentTrackLenght, Mode=OneWay}" Value="{Binding CurrentTrackPosition, Mode=TwoWay}" x:Name="TrackControl" VerticalAlignment="Center">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="PreviewMouseDown">
                         <i:InvokeCommandAction Command="{Binding TrackControlMouseDownCommand}"></i:InvokeCommandAction>
