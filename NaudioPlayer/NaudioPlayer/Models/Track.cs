@@ -36,8 +36,7 @@ namespace NaudioPlayer.Models
                 OnPropertyChanged(nameof(Filepath));
             }
         }
-       
-
+        
         public event PropertyChangedEventHandler PropertyChanged;
 
         public Track(string filepath, string friendlyName)
