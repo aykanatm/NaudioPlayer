@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 
@@ -11,6 +6,11 @@ namespace NaudioWrapper
 {
     public class AudioPlayer
     {
+        public enum PlaybackStopTypes
+        {
+            PlaybackStoppedByUser, PlaybackStoppedReachingEndOfFile
+        }
+
         private AudioFileReader _audioFileReader;
 
         private WasapiOut _output;
@@ -22,9 +22,6 @@ namespace NaudioWrapper
         public event Action PlaybackResumed;
         public event Action PlaybackStopped;
         public event Action PlaybackPaused;
-        public event Action<double> UpdateTrackPosition;
-
-        private PlaybackState _currentPlaybackState;
 
         public AudioPlayer()
         {
@@ -33,16 +30,16 @@ namespace NaudioWrapper
             //_currentOutputDevice = defaultOutputDevice;
         }
 
-        public void LoadFile(string filepath)
+        public void LoadFile(string filepath, float volume)
         {
             _filepath = filepath;
-            InitializeStream();
+            InitializeStream(volume);
             InitializeOutput();
         }
 
-        private void InitializeStream()
+        private void InitializeStream(float volume)
         {
-            _audioFileReader = new AudioFileReader(_filepath) {Volume = 1};
+            _audioFileReader = new AudioFileReader(_filepath) {Volume = volume};
         }
 
         private void InitializeOutput()
@@ -53,12 +50,10 @@ namespace NaudioWrapper
 
         public void Play(PlaybackState playbackState, double currentVolumeLevel)
         {
-            _currentPlaybackState = PlaybackState.Playing;
-
             if (playbackState == PlaybackState.Stopped)
             {
                 _output.PlaybackStopped += _output_PlaybackStopped;
-                InitializeStream();
+                InitializeStream(_audioFileReader.Volume);
                 InitializeOutput();
                 _output.Play();
             }
@@ -77,34 +72,37 @@ namespace NaudioWrapper
 
         private void _output_PlaybackStopped(object sender, StoppedEventArgs e)
         {
-            _currentPlaybackState = PlaybackState.Stopped;
+            Dispose();
             if (PlaybackStopped != null)
             {
                 PlaybackStopped();
             }
-            Dispose();
+            
         }
 
         public void Stop()
         {
-            _currentPlaybackState = PlaybackState.Stopped;
             if (_output != null)
             {
-                _output.Stop();
+                Dispose();
+
+                if (PlaybackStopped != null)
+                {
+                    PlaybackStopped();
+                }
             }
         }
 
         public void Pause()
         {
-            _currentPlaybackState = PlaybackState.Paused;
             if (_output != null)
             {
+                _output.Pause();
+
                 if (PlaybackPaused != null)
                 {
                     PlaybackPaused();
                 }
-
-                _output.Pause();
             }
         }
 
