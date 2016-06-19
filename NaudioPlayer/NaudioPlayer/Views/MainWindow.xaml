@@ -31,27 +31,29 @@
                 <ColumnDefinition Width="30"/>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Margin="3" Command="{Binding RewindToStartCommand}">
-                <TextBlock Text="Rewind To Beginning"></TextBlock>
+                <Image Source="../Images/skip_previous.png"></Image>
             </Button>
             <Button Grid.Column="1" Margin="3" Command="{Binding StartPlaybackCommand}">
-                <TextBlock Text="Play/Pause"></TextBlock>
+                <Image Source="../Images/play.png"></Image>
             </Button>
             <Button Grid.Column="2" Margin="3" Command="{Binding StopPlaybackCommand}">
-                <TextBlock Text="Stop"></TextBlock>
+                <Image Source="../Images/stop.png"></Image>
             </Button>
             <Button Grid.Column="3" Margin="3" Command="{Binding ForwardToEndCommand}">
-                <TextBlock Text="Forward to End"></TextBlock>
+                <Image Source="../Images/skip_next.png"></Image>
             </Button>
             <Button Grid.Column="5" Margin="3" Command="{Binding ShuffleCommand}">
-                <TextBlock Text="Shuffle"></TextBlock>
+                <Image Source="../Images/shuffle.png"></Image>
             </Button>
         </Grid>
         <Grid DockPanel.Dock="Bottom" Margin="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Slider Grid.Column="0" Minimum="0" Maximum="{Binding CurrentTrackLenght, Mode=OneWay}" Value="{Binding CurrentTrackPosition, Mode=TwoWay}" x:Name="TrackControl">
+            <Slider Grid.Column="0" Minimum="0" Maximum="{Binding CurrentTrackLenght, Mode=OneWay}" Value="{Binding CurrentTrackPosition, Mode=OneWay}" x:Name="TrackControl" VerticalAlignment="Center">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="PreviewMouseDown">
                         <i:InvokeCommandAction Command="{Binding TrackControlMouseDownCommand}"></i:InvokeCommandAction>
@@ -61,7 +63,8 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Slider>
-            <Slider Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding CurrentVolume, Mode=TwoWay}" x:Name="VolumeControl"/>
+            <Image Grid.Column="2" Source="../Images/volume.png"></Image>
+            <Slider Grid.Column="3" Minimum="0" Maximum="100" Value="{Binding CurrentVolume, Mode=TwoWay}" x:Name="VolumeControl" VerticalAlignment="Center"/>
         </Grid>
         <ListView x:Name="Playlist" ItemsSource="{Binding Playlist}" SelectedItem="{Binding CurrentTrack, Mode=TwoWay}">
             <ListView.ItemTemplate>
