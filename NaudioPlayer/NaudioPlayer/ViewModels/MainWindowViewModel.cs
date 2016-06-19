@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using NaudioPlayer.Annotations;
 using NaudioPlayer.Models;
 using NaudioWrapper;
@@ -216,14 +217,12 @@ namespace NaudioPlayer.ViewModels
 
         private void AddFolderToPlaylist(object p)
         {
-            var ofd = new OpenFileDialog();
-            ofd.ValidateNames = false;
-            ofd.CheckFileExists = false;
-            ofd.FileName = "Folder Selection";
-            var result = ofd.ShowDialog();
-            if (result == true)
+            var cofd = new CommonOpenFileDialog();
+            cofd.IsFolderPicker = true;
+            var result = cofd.ShowDialog();
+            if (result == CommonFileDialogResult.Ok)
             {
-                var folderName = ofd.FileName.Replace("Folder Selection", "");
+                var folderName = cofd.FileName;
                 var audioFiles = Directory.GetFiles(folderName, "*.wav", SearchOption.AllDirectories);
                 foreach (var audioFile in audioFiles)
                 {
