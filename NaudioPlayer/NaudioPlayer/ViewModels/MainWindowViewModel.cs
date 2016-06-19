@@ -195,13 +195,7 @@ namespace NaudioPlayer.ViewModels
             var result = ofd.ShowDialog();
             if (result == true)
             {
-                var removeExtension = ofd.SafeFileName.TakeWhile(c => c != '.');
-                var enumerable = removeExtension as char[] ?? removeExtension.ToArray();
-                string friendlyName = string.Empty;
-                for (int i = 0; i < enumerable.Length; i++)
-                {
-                    friendlyName += enumerable[i];
-                }
+                var friendlyName = ofd.SafeFileName.Remove(ofd.SafeFileName.Length - 4);
                 var track = new Track(ofd.FileName, friendlyName);
                 Playlist.Add(track);
             }
@@ -226,10 +220,28 @@ namespace NaudioPlayer.ViewModels
                 var audioFiles = Directory.GetFiles(folderName, "*.wav", SearchOption.AllDirectories);
                 foreach (var audioFile in audioFiles)
                 {
-                    var track = new Track(audioFile,audioFile);
+                    var removePath = RemovePath(audioFile);
+                    var friendlyName = removePath.Remove(removePath.Length - 4);
+                    var track = new Track(audioFile, friendlyName);
                     Playlist.Add(track);
                 }
             }
+        }
+
+        private string RemovePath(string input)
+        {
+            if (input.Contains("\\"))
+            {
+                var modifiedInput = input.SkipWhile(s => s != '\\').Skip(1);
+                string output = string.Empty;
+                var enumerable = modifiedInput as char[] ?? modifiedInput.ToArray();
+                for (int i = 0; i < enumerable.Count(); i++)
+                {
+                    output += enumerable[i];
+                }
+                return RemovePath(output);
+            }
+            return input;
         }
         private bool CanAddFolderToPlaylist(object p)
         {
