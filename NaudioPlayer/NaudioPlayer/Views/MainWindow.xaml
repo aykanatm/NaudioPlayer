@@ -31,19 +31,19 @@
                 <ColumnDefinition Width="30"/>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Margin="3" Command="{Binding RewindToStartCommand}">
-                <Image Source="../Images/skip_previous.png"></Image>
+                <Image Source="../Images/skip_previous.png" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             </Button>
             <Button Grid.Column="1" Margin="3" Command="{Binding StartPlaybackCommand}">
-                <Image Source="../Images/play.png"></Image>
+                <Image Source="../Images/play.png" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             </Button>
             <Button Grid.Column="2" Margin="3" Command="{Binding StopPlaybackCommand}">
-                <Image Source="../Images/stop.png"></Image>
+                <Image Source="../Images/stop.png" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             </Button>
             <Button Grid.Column="3" Margin="3" Command="{Binding ForwardToEndCommand}">
-                <Image Source="../Images/skip_next.png"></Image>
+                <Image Source="../Images/skip_next.png" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             </Button>
             <Button Grid.Column="5" Margin="3" Command="{Binding ShuffleCommand}">
-                <Image Source="../Images/shuffle.png"></Image>
+                <Image Source="../Images/shuffle.png" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             </Button>
         </Grid>
         <Grid DockPanel.Dock="Bottom" Margin="3">
