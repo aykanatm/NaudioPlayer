@@ -12,11 +12,8 @@ namespace NaudioPlayer.Models
 {
     public class Track : INotifyPropertyChanged
     {
-        private readonly AudioPlayer _audioPlayer;
         private string _friendlyName;
         private string _filepath;
-        private double _lenght;
-        private double _currentPosition;
 
         public string FriendlyName
         {
@@ -39,37 +36,14 @@ namespace NaudioPlayer.Models
                 OnPropertyChanged(nameof(Filepath));
             }
         }
-
-        public double Lenght
-        {
-            get { return _audioPlayer.GetLenghtInSeconds(); }
-            set
-            {
-                if (value == _lenght) return;
-                _lenght = value;
-                OnPropertyChanged(nameof(Lenght));
-            }
-        }
-
-        public double CurrentPosition
-        {
-            get { return _audioPlayer.GetPositionInSeconds(); }
-            set
-            {
-                if (value == _currentPosition) return;
-                _audioPlayer.SetPosition(value);
-                _currentPosition = value;
-                OnPropertyChanged(nameof(CurrentPosition));
-            }
-        }
+       
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public Track(AudioPlayer audioPlayer, string filepath)
+        public Track(string filepath, string friendlyName)
         {
-            _audioPlayer = audioPlayer;
             Filepath = filepath;
-            CurrentPosition = 0;
+            FriendlyName = friendlyName;
         }
 
         [NotifyPropertyChangedInvocator]
