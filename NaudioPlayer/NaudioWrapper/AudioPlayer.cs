@@ -1,5 +1,4 @@
 ﻿using System;
-using NAudio.CoreAudioApi;
 using NAudio.Wave;
 
 namespace NaudioWrapper
@@ -13,7 +12,7 @@ namespace NaudioWrapper
 
         private AudioFileReader _audioFileReader;
 
-        private WasapiOut _output;
+        private DirectSoundOut _output;
 
         private string _filepath;
 
@@ -44,15 +43,18 @@ namespace NaudioWrapper
 
         private void InitializeOutput()
         {
-            _output = new WasapiOut(AudioClientShareMode.Shared, 200);
-            _output.Init(_audioFileReader);
+            _output = new DirectSoundOut(200);
+            _output.PlaybackStopped += _output_PlaybackStopped;
+            
+            var wc = new WaveChannel32(_audioFileReader);
+            wc.PadWithZeroes = false;
+            _output.Init(wc);
         }
 
         public void Play(PlaybackState playbackState, double currentVolumeLevel)
         {
             if (playbackState == PlaybackState.Stopped)
             {
-                _output.PlaybackStopped += _output_PlaybackStopped;
                 InitializeStream(_audioFileReader.Volume);
                 InitializeOutput();
                 _output.Play();
@@ -77,7 +79,6 @@ namespace NaudioWrapper
             {
                 PlaybackStopped();
             }
-            
         }
 
         public void Stop()
