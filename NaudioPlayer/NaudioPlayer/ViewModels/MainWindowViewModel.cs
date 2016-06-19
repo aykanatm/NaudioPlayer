@@ -34,6 +34,7 @@ namespace NaudioPlayer.ViewModels
         private string _title;
         private double _currentTrackLenght;
         private double _currentTrackPosition;
+        private string _playPauseImageSource;
 
         private Track _currentTrack;
         private ObservableCollection<Track> _playlist;
@@ -46,6 +47,17 @@ namespace NaudioPlayer.ViewModels
                 if (value == _title) return;
                 _title = value;
                 OnPropertyChanged(nameof(Title));
+            }
+        }
+
+        public string PlayPauseImageSource
+        {
+            get { return _playPauseImageSource; }
+            set
+            {
+                if (value == _playPauseImageSource) return;
+                _playPauseImageSource = value;
+                OnPropertyChanged(nameof(PlayPauseImageSource));
             }
         }
 
@@ -140,6 +152,7 @@ namespace NaudioPlayer.ViewModels
             _audioPlayer.PlaybackResumed += _audioPlayer_PlaybackResumed;
             _audioPlayer.PlaybackStopped += _audioPlayer_PlaybackStopped;
             _playbackState = PlaybackState.Stopped;
+            PlayPauseImageSource = "../Images/play.png";
         }
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
@@ -150,16 +163,20 @@ namespace NaudioPlayer.ViewModels
         private void _audioPlayer_PlaybackStopped()
         {
             _playbackState = PlaybackState.Stopped;
+            PlayPauseImageSource = "../Images/play.png";
+            CommandManager.InvalidateRequerySuggested();
         }
 
         private void _audioPlayer_PlaybackResumed()
         {
             _playbackState = PlaybackState.Playing;
+            PlayPauseImageSource = "../Images/pause.png";
         }
 
         private void _audioPlayer_PlaybackPaused()
         {
             _playbackState = PlaybackState.Paused;
+            PlayPauseImageSource = "../Images/play.png";
         }
 
         private void LoadCommands()
@@ -276,6 +293,7 @@ namespace NaudioPlayer.ViewModels
                     CurrentVolume = MaxVolume;
                 }
             }
+
             _audioPlayer.TogglePlayPause(CurrentVolume);
         }
 
