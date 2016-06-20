@@ -14,7 +14,9 @@
     <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
-                <MenuItem Header="Exit" Command="{Binding ExitApplicationCommand}"></MenuItem>
+                <MenuItem Header="Save Playlist" Command="{Binding SavePlaylistCommand}"/>
+                <MenuItem Header="Load Playlist" Command="{Binding LoadPlaylistCommand}"/>
+                <MenuItem Header="Exit" Command="{Binding ExitApplicationCommand}"/>
             </MenuItem>
             <MenuItem Header="Media">
                 <MenuItem Header="Add File to Playlist..." Command="{Binding AddFileToPlaylistCommand}"/>
