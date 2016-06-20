@@ -84,6 +84,8 @@
     <Compile Include="Models\Track.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="RelayCommand.cs" />
+    <Compile Include="Services\PlaylistLoader.cs" />
+    <Compile Include="Services\PlaylistSaver.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -119,12 +121,22 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\MyLibrary\MyLibrary.CustomCollections\MyLibrary.CustomCollections.csproj">
+      <Project>{3d54a7a5-518b-4303-a0e8-0467d133a918}</Project>
+      <Name>MyLibrary.CustomCollections</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\MyLibrary\MyLibrary.StringOperations\MyLibrary.StringOperations.csproj">
+      <Project>{78d0e92b-7601-4b39-ac45-5fd9b09fffc3}</Project>
+      <Name>MyLibrary.StringOperations</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NaudioWrapper\NaudioWrapper.csproj">
       <Project>{0e3d7543-3084-48e7-8b5f-7da5614d3c34}</Project>
       <Name>NaudioWrapper</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\pause.png" />
     <Resource Include="Images\play.png" />

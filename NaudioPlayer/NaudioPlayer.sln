@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaudioPlayer", "NaudioPlaye
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaudioWrapper", "NaudioWrapper\NaudioWrapper.csproj", "{0E3D7543-3084-48E7-8B5F-7DA5614D3C34}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyLibrary.StringOperations", "..\..\MyLibrary\MyLibrary.StringOperations\MyLibrary.StringOperations.csproj", "{78D0E92B-7601-4B39-AC45-5FD9B09FFFC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyLibrary.CustomCollections", "..\..\MyLibrary\MyLibrary.CustomCollections\MyLibrary.CustomCollections.csproj", "{3D54A7A5-518B-4303-A0E8-0467D133A918}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{0E3D7543-3084-48E7-8B5F-7DA5614D3C34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E3D7543-3084-48E7-8B5F-7DA5614D3C34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E3D7543-3084-48E7-8B5F-7DA5614D3C34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78D0E92B-7601-4B39-AC45-5FD9B09FFFC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78D0E92B-7601-4B39-AC45-5FD9B09FFFC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78D0E92B-7601-4B39-AC45-5FD9B09FFFC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78D0E92B-7601-4B39-AC45-5FD9B09FFFC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D54A7A5-518B-4303-A0E8-0467D133A918}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D54A7A5-518B-4303-A0E8-0467D133A918}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D54A7A5-518B-4303-A0E8-0467D133A918}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D54A7A5-518B-4303-A0E8-0467D133A918}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
