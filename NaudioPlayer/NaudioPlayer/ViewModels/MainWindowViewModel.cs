@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -150,6 +151,24 @@ namespace NaudioPlayer.ViewModels
 
             PlayPauseImageSource = "../Images/play.png";
             CurrentVolume = 1;
+
+            var timer = new System.Timers.Timer();
+            timer.Interval = 300;
+            timer.Elapsed += Timer_Elapsed;
+            timer.Start();
+        }
+
+        private void UpdateSeekBar()
+        {
+            if (_playbackState == PlaybackState.Playing)
+            {
+                CurrentTrackPosition = _audioPlayer.GetPositionInSeconds();
+            }
+        }
+
+        private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            UpdateSeekBar();
         }
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
