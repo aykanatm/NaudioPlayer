@@ -228,7 +228,7 @@ namespace NaudioPlayer.ViewModels
         private void AddFileToPlaylist(object p)
         {
             var ofd = new OpenFileDialog();
-            ofd.Filter = "Audio files (*.wav, *.mp3) | *.wav; *.mp3";
+            ofd.Filter = "Audio files (*.wav, *.mp3, *.wma, *.ogg, *.flac) | *.wav; *.mp3; *.wma; *.ogg; *.flac";
             var result = ofd.ShowDialog();
             if (result == true)
             {
@@ -254,7 +254,8 @@ namespace NaudioPlayer.ViewModels
             if (result == CommonFileDialogResult.Ok)
             {
                 var folderName = cofd.FileName;
-                var audioFiles = Directory.GetFiles(folderName, "*.wav", SearchOption.AllDirectories);
+                var audioFiles = Directory.EnumerateFiles(folderName, "*.", SearchOption.AllDirectories)
+                                          .Where(f=>f.EndsWith(".wav") || f.EndsWith(".wav") || f.EndsWith(".wma") || f.EndsWith(".ogg") || f.EndsWith(".flac"));
                 foreach (var audioFile in audioFiles)
                 {
                     var removePath = RemovePath(audioFile);
