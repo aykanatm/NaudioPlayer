@@ -149,7 +149,7 @@ namespace NaudioPlayer.ViewModels
             _playbackState = PlaybackState.Stopped;
 
             PlayPauseImageSource = "../Images/play.png";
-            CurrentVolume = 1;
+            CurrentVolume = 100;
 
             var timer = new System.Timers.Timer();
             timer.Interval = 300;
@@ -257,7 +257,7 @@ namespace NaudioPlayer.ViewModels
             {
                 var folderName = cofd.FileName;
                 var audioFiles = Directory.EnumerateFiles(folderName, "*.*", SearchOption.AllDirectories)
-                                          .Where(f=>f.EndsWith(".wav") || f.EndsWith(".wav") || f.EndsWith(".wma") || f.EndsWith(".ogg") || f.EndsWith(".flac"));
+                                          .Where(f=>f.EndsWith(".wav") || f.EndsWith(".mp3") || f.EndsWith(".wma") || f.EndsWith(".ogg") || f.EndsWith(".flac"));
                 foreach (var audioFile in audioFiles)
                 {
                     var removePath = audioFile.RemovePath();
