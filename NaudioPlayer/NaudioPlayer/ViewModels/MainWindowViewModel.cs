@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using MyLibrary.CustomCollections.ExtensionMethods;
+using MyLibrary.StringOperations.ExtensionMethods;
 using NaudioPlayer.Annotations;
 using NaudioPlayer.Models;
+using NaudioPlayer.Services;
 using NaudioWrapper;
 
 namespace NaudioPlayer.ViewModels
@@ -120,6 +117,8 @@ namespace NaudioPlayer.ViewModels
         public ICommand ExitApplicationCommand { get; set; }
         public ICommand AddFileToPlaylistCommand { get; set; }
         public ICommand AddFolderToPlaylistCommand { get; set; }
+        public ICommand SavePlaylistCommand { get; set; }
+        public ICommand LoadPlaylistCommand { get; set; }
 
         public ICommand RewindToStartCommand { get; set; }
         public ICommand StartPlaybackCommand { get; set; }
@@ -201,6 +200,8 @@ namespace NaudioPlayer.ViewModels
             ExitApplicationCommand = new RelayCommand(ExitApplication,CanExitApplication);
             AddFileToPlaylistCommand = new RelayCommand(AddFileToPlaylist, CanAddFileToPlaylist);
             AddFolderToPlaylistCommand = new RelayCommand(AddFolderToPlaylist, CanAddFolderToPlaylist);
+            SavePlaylistCommand = new RelayCommand(SavePlaylist, CanSavePlaylist);
+            LoadPlaylistCommand = new RelayCommand(LoadPlaylist, CanLoadPlaylist);
 
             // Player commands
             RewindToStartCommand = new RelayCommand(RewindToStart, CanRewindToStart);
@@ -215,6 +216,7 @@ namespace NaudioPlayer.ViewModels
             VolumeControlValueChangedCommand = new RelayCommand(VolumeControlValueChanged, CanVolumeControlValueChanged);
         }
 
+        // Menu commands
         private void ExitApplication(object p)
         {
             _audioPlayer.Dispose();
@@ -254,11 +256,11 @@ namespace NaudioPlayer.ViewModels
             if (result == CommonFileDialogResult.Ok)
             {
                 var folderName = cofd.FileName;
-                var audioFiles = Directory.EnumerateFiles(folderName, "*.", SearchOption.AllDirectories)
+                var audioFiles = Directory.EnumerateFiles(folderName, "*.*", SearchOption.AllDirectories)
                                           .Where(f=>f.EndsWith(".wav") || f.EndsWith(".wav") || f.EndsWith(".wma") || f.EndsWith(".ogg") || f.EndsWith(".flac"));
                 foreach (var audioFile in audioFiles)
                 {
-                    var removePath = RemovePath(audioFile);
+                    var removePath = audioFile.RemovePath();
                     var friendlyName = removePath.Remove(removePath.Length - 4);
                     var track = new Track(audioFile, friendlyName);
                     Playlist.Add(track);
@@ -267,21 +269,6 @@ namespace NaudioPlayer.ViewModels
             }
         }
 
-        private string RemovePath(string input)
-        {
-            if (input.Contains("\\"))
-            {
-                var modifiedInput = input.SkipWhile(s => s != '\\').Skip(1);
-                string output = string.Empty;
-                var enumerable = modifiedInput as char[] ?? modifiedInput.ToArray();
-                for (int i = 0; i < enumerable.Count(); i++)
-                {
-                    output += enumerable[i];
-                }
-                return RemovePath(output);
-            }
-            return input;
-        }
         private bool CanAddFolderToPlaylist(object p)
         {
             if (_playbackState == PlaybackState.Stopped)
@@ -291,6 +278,40 @@ namespace NaudioPlayer.ViewModels
             return false;
         }
 
+        private void SavePlaylist(object p)
+        {
+            var sfd = new SaveFileDialog();
+            sfd.CreatePrompt = false;
+            sfd.OverwritePrompt = true;
+            sfd.Filter = "PLAYLIST files (*.playlist) | *.playlist";
+            if (sfd.ShowDialog() == true)
+            {
+                var ps = new PlaylistSaver();
+                ps.Save(Playlist, sfd.FileName);
+            }
+        }
+
+        private bool CanSavePlaylist(object p)
+        {
+            return true;
+        }
+
+        private void LoadPlaylist(object p)
+        {
+            var ofd = new OpenFileDialog();
+            ofd.Filter = "PLAYLIST files (*.playlist) | *.playlist";
+            if (ofd.ShowDialog() == true)
+            {
+                Playlist = new PlaylistLoader().Load(ofd.FileName).ToObservableCollection();
+            }
+        }
+
+        private bool CanLoadPlaylist(object p)
+        {
+            return true;
+        }
+
+        // Player commands
         private void RewindToStart(object p)
         {
             _audioPlayer.SetPosition(0);
