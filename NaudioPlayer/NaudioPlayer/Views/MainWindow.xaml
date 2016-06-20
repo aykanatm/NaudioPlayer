@@ -64,7 +64,13 @@
                 </i:Interaction.Triggers>
             </Slider>
             <Image Grid.Column="2" Source="../Images/volume.png"></Image>
-            <Slider Grid.Column="3" Minimum="0" Maximum="100" Value="{Binding CurrentVolume, Mode=TwoWay}" x:Name="VolumeControl" VerticalAlignment="Center"/>
+            <Slider Grid.Column="3" Minimum="0" Maximum="1" Value="{Binding CurrentVolume, Mode=TwoWay}" x:Name="VolumeControl" VerticalAlignment="Center">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="ValueChanged">
+                        <i:InvokeCommandAction Command="{Binding VolumeControlValueChangedCommand}"></i:InvokeCommandAction>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Slider>
         </Grid>
         <ListView x:Name="Playlist" ItemsSource="{Binding Playlist}" SelectedItem="{Binding CurrentTrack, Mode=TwoWay}">
             <ListView.ItemTemplate>

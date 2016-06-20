@@ -20,8 +20,6 @@ namespace NaudioPlayer.ViewModels
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        private const float MaxVolume = 100;
-
         private enum PlaybackState
         {
             Playing, Stopped, Paused
@@ -35,6 +33,7 @@ namespace NaudioPlayer.ViewModels
         private double _currentTrackLenght;
         private double _currentTrackPosition;
         private string _playPauseImageSource;
+        private float _currentVolume;
 
         private Track _currentTrack;
         private ObservableCollection<Track> _playlist;
@@ -63,17 +62,12 @@ namespace NaudioPlayer.ViewModels
 
         public float CurrentVolume
         {
-            get
-            {
-                return _audioPlayer.GetVolume();
-            }
+            get { return _currentVolume; }
             set
             {
-                if (_audioPlayer != null)
-                {
-                    _audioPlayer.SetVolume(value);
-                }
-                
+
+                if (value == _currentVolume) return;
+                _currentVolume = value;
                 OnPropertyChanged(nameof(CurrentVolume));
             }
         }
@@ -134,6 +128,7 @@ namespace NaudioPlayer.ViewModels
 
         public ICommand TrackControlMouseDownCommand { get; set; }
         public ICommand TrackControlMouseUpCommand { get; set; }
+        public ICommand VolumeControlValueChangedCommand { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -152,7 +147,9 @@ namespace NaudioPlayer.ViewModels
             _audioPlayer.PlaybackResumed += _audioPlayer_PlaybackResumed;
             _audioPlayer.PlaybackStopped += _audioPlayer_PlaybackStopped;
             _playbackState = PlaybackState.Stopped;
+
             PlayPauseImageSource = "../Images/play.png";
+            CurrentVolume = 1;
         }
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
@@ -181,18 +178,22 @@ namespace NaudioPlayer.ViewModels
 
         private void LoadCommands()
         {
+            // Menu commands
             ExitApplicationCommand = new RelayCommand(ExitApplication,CanExitApplication);
             AddFileToPlaylistCommand = new RelayCommand(AddFileToPlaylist, CanAddFileToPlaylist);
             AddFolderToPlaylistCommand = new RelayCommand(AddFolderToPlaylist, CanAddFolderToPlaylist);
 
+            // Player commands
             RewindToStartCommand = new RelayCommand(RewindToStart, CanRewindToStart);
             StartPlaybackCommand = new RelayCommand(StartPlayback, CanStartPlayback);
             StopPlaybackCommand = new RelayCommand(StopPlayback, CanStopPlayback);
             ForwardToEndCommand = new RelayCommand(ForwardToEnd, CanForwardToEnd);
             ShuffleCommand = new RelayCommand(Shuffle, CanShuffle);
 
+            // Event commands
             TrackControlMouseDownCommand = new RelayCommand(TrackControlMouseDown, CanTrackControlMouseDown);
             TrackControlMouseUpCommand = new RelayCommand(TrackControlMouseUp, CanTrackControlMouseUp);
+            VolumeControlValueChangedCommand = new RelayCommand(VolumeControlValueChanged, CanVolumeControlValueChanged);
         }
 
         private void ExitApplication(object p)
@@ -242,6 +243,7 @@ namespace NaudioPlayer.ViewModels
                     var track = new Track(audioFile, friendlyName);
                     Playlist.Add(track);
                 }
+                Playlist = new ObservableCollection<Track>(Playlist.OrderBy(z => z.FriendlyName).ToList());
             }
         }
 
@@ -288,9 +290,8 @@ namespace NaudioPlayer.ViewModels
             {
                 if (CurrentTrack != null)
                 {
-                    _audioPlayer.LoadFile(CurrentTrack.Filepath, MaxVolume);
+                    _audioPlayer.LoadFile(CurrentTrack.Filepath, CurrentVolume);
                     CurrentTrackLenght = _audioPlayer.GetLenghtInSeconds();
-                    CurrentVolume = MaxVolume;
                 }
             }
 
@@ -345,6 +346,7 @@ namespace NaudioPlayer.ViewModels
             return false;
         }
 
+        // Events
         private void TrackControlMouseDown(object p)
         {
             _audioPlayer.Pause();
@@ -372,6 +374,16 @@ namespace NaudioPlayer.ViewModels
                 return true;
             }
             return false;
+        }
+
+        private void VolumeControlValueChanged(object p)
+        {
+            _audioPlayer.SetVolume(CurrentVolume);
+        }
+
+        private bool CanVolumeControlValueChanged(object p)
+        {
+            return true;
         }
 
         [NotifyPropertyChangedInvocator]
