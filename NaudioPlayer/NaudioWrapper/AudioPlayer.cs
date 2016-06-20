@@ -154,7 +154,6 @@ namespace NaudioWrapper
             {
                 return 0;
             }
-            
         }
 
         public double GetPositionInSeconds()
