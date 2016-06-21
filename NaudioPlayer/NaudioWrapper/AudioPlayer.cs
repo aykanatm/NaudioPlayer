@@ -10,6 +10,8 @@ namespace NaudioWrapper
             PlaybackStoppedByUser, PlaybackStoppedReachingEndOfFile
         }
 
+        public PlaybackStopTypes PlaybackStopType { get; set; } = PlaybackStopTypes.PlaybackStoppedReachingEndOfFile;
+
         private AudioFileReader _audioFileReader;
 
         private DirectSoundOut _output;
@@ -85,12 +87,7 @@ namespace NaudioWrapper
         {
             if (_output != null)
             {
-                Dispose();
-
-                if (PlaybackStopped != null)
-                {
-                    PlaybackStopped();
-                }
+                _output.Stop();
             }
         }
 
