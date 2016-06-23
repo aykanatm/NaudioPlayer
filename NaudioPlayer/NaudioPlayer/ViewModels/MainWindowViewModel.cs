@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Win32;
@@ -25,17 +26,16 @@ namespace NaudioPlayer.ViewModels
 
         private PlaybackState _playbackState;
 
+        private ObservableCollection<Track> _playlist;
+        private Track _currentlyPlayingTrack;
+        private Track _currentlySelectedTrack;
         private AudioPlayer _audioPlayer;
-
+        
         private string _title;
         private double _currentTrackLenght;
         private double _currentTrackPosition;
         private string _playPauseImageSource;
         private float _currentVolume;
-        
-        private ObservableCollection<Track> _playlist;
-        private Track _currentlyPlayingTrack;
-        private Track _currentlySelectedTrack;
 
         public string Title
         {
@@ -181,7 +181,10 @@ namespace NaudioPlayer.ViewModels
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
-            _audioPlayer.Dispose();
+            if (_audioPlayer != null)
+            {
+                _audioPlayer.Dispose();
+            }
         }
 
         private void _audioPlayer_PlaybackStopped()
@@ -194,6 +197,10 @@ namespace NaudioPlayer.ViewModels
             if (_audioPlayer.PlaybackStopType == AudioPlayer.PlaybackStopTypes.PlaybackStoppedReachingEndOfFile)
             {
                 CurrentlySelectedTrack = Playlist.NextItem(CurrentlyPlayingTrack);
+                StartPlayback(null);
+            }
+            else if (_audioPlayer.PlaybackStopType == AudioPlayer.PlaybackStopTypes.PlaybackStoppedToPlayAnotherFile)
+            {
                 StartPlayback(null);
             }
         }
@@ -235,7 +242,11 @@ namespace NaudioPlayer.ViewModels
         // Menu commands
         private void ExitApplication(object p)
         {
-            _audioPlayer.Dispose();
+            if (_audioPlayer != null)
+            {
+                _audioPlayer.Dispose();
+            }
+            
             Application.Current.Shutdown();
         }
         private bool CanExitApplication(object p)
@@ -343,32 +354,34 @@ namespace NaudioPlayer.ViewModels
 
         private void StartPlayback(object p)
         {
-            if (_playbackState == PlaybackState.Stopped)
+            if (CurrentlySelectedTrack != null)
             {
-                if (CurrentlySelectedTrack != null)
+                if (CurrentlyPlayingTrack != CurrentlySelectedTrack)
                 {
-                    _audioPlayer = new AudioPlayer(CurrentlySelectedTrack.Filepath, CurrentVolume);
-                    _audioPlayer.PlaybackPaused += _audioPlayer_PlaybackPaused;
-                    _audioPlayer.PlaybackResumed += _audioPlayer_PlaybackResumed;
-                    _audioPlayer.PlaybackStopped += _audioPlayer_PlaybackStopped;
-                    CurrentTrackLenght = _audioPlayer.GetLenghtInSeconds();
-                    CurrentlyPlayingTrack = CurrentlySelectedTrack;
+                    if (CurrentlyPlayingTrack == null || _playbackState == PlaybackState.Stopped)
+                    {
+                        _audioPlayer = new AudioPlayer(CurrentlySelectedTrack.Filepath, CurrentVolume);
+                        _audioPlayer.PlaybackStopType = AudioPlayer.PlaybackStopTypes.PlaybackStoppedReachingEndOfFile;
+                        _audioPlayer.PlaybackPaused += _audioPlayer_PlaybackPaused;
+                        _audioPlayer.PlaybackResumed += _audioPlayer_PlaybackResumed;
+                        _audioPlayer.PlaybackStopped += _audioPlayer_PlaybackStopped;
+                        CurrentTrackLenght = _audioPlayer.GetLenghtInSeconds();
+                        CurrentlyPlayingTrack = CurrentlySelectedTrack;
+                    }
+                    else
+                    {
+                        if (_audioPlayer != null)
+                        {
+                            _audioPlayer.PlaybackStopType = AudioPlayer.PlaybackStopTypes.PlaybackStoppedToPlayAnotherFile;
+                            _audioPlayer.Stop();
+                            // This is here to stop stuttering of audio while one clip ends other begins
+                            Thread.Sleep(500);
+                        }
+                    }
                 }
+
+                _audioPlayer.TogglePlayPause(CurrentVolume);
             }
-            if ((_playbackState == PlaybackState.Playing || _playbackState == PlaybackState.Paused) && CurrentlyPlayingTrack != CurrentlySelectedTrack)
-            {
-                StopPlayback(null);
-                if (CurrentlySelectedTrack != null)
-                {
-                    _audioPlayer = new AudioPlayer(CurrentlySelectedTrack.Filepath, CurrentVolume);
-                    _audioPlayer.PlaybackPaused += _audioPlayer_PlaybackPaused;
-                    _audioPlayer.PlaybackResumed += _audioPlayer_PlaybackResumed;
-                    _audioPlayer.PlaybackStopped += _audioPlayer_PlaybackStopped;
-                    CurrentTrackLenght = _audioPlayer.GetLenghtInSeconds();
-                    CurrentlyPlayingTrack = CurrentlySelectedTrack;
-                }
-            }
-            _audioPlayer.TogglePlayPause(CurrentVolume);
         }
 
         private bool CanStartPlayback(object p)
@@ -401,6 +414,7 @@ namespace NaudioPlayer.ViewModels
         {
             if (_audioPlayer != null)
             {
+                _audioPlayer.PlaybackStopType = AudioPlayer.PlaybackStopTypes.PlaybackStoppedReachingEndOfFile;
                 _audioPlayer.SetPosition(_audioPlayer.GetLenghtInSeconds());
             }
         }

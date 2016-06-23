@@ -7,10 +7,10 @@ namespace NaudioWrapper
     {
         public enum PlaybackStopTypes
         {
-            PlaybackStoppedByUser, PlaybackStoppedReachingEndOfFile
+            PlaybackStoppedByUser, PlaybackStoppedReachingEndOfFile, PlaybackStoppedToPlayAnotherFile
         }
 
-        public PlaybackStopTypes PlaybackStopType { get; set; } = PlaybackStopTypes.PlaybackStoppedReachingEndOfFile;
+        public PlaybackStopTypes PlaybackStopType { get; set; }
 
         private AudioFileReader _audioFileReader;
 
@@ -131,14 +131,7 @@ namespace NaudioWrapper
 
         public double GetPositionInSeconds()
         {
-            if (_audioFileReader != null)
-            {
-                return _audioFileReader.CurrentTime.TotalSeconds;
-            }
-            else
-            {
-                return 0;
-            }
+            return _audioFileReader != null ? _audioFileReader.CurrentTime.TotalSeconds : 0;
         }
 
         public float GetVolume()
