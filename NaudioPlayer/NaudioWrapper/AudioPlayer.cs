@@ -16,52 +16,28 @@ namespace NaudioWrapper
 
         private DirectSoundOut _output;
 
-        private string _filepath;
-
-        //private readonly MMDevice _currentOutputDevice;
-
         public event Action PlaybackResumed;
         public event Action PlaybackStopped;
         public event Action PlaybackPaused;
 
-        public AudioPlayer()
+        public AudioPlayer(string filepath, float volume)
         {
-            //var enumerator = new MMDeviceEnumerator();
-            //var defaultOutputDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-            //_currentOutputDevice = defaultOutputDevice;
-        }
+            PlaybackStopType = PlaybackStopTypes.PlaybackStoppedReachingEndOfFile;
 
-        public void LoadFile(string filepath, float volume)
-        {
-            _filepath = filepath;
-            InitializeStream(volume);
-            InitializeOutput();
-        }
+            _audioFileReader = new AudioFileReader(filepath) { Volume = volume };
 
-        private void InitializeStream(float volume)
-        {
-            _audioFileReader = new AudioFileReader(_filepath) {Volume = volume};
-        }
-
-        private void InitializeOutput()
-        {
             _output = new DirectSoundOut(200);
             _output.PlaybackStopped += _output_PlaybackStopped;
-            
+
             var wc = new WaveChannel32(_audioFileReader);
             wc.PadWithZeroes = false;
+
             _output.Init(wc);
         }
 
         public void Play(PlaybackState playbackState, double currentVolumeLevel)
         {
-            if (playbackState == PlaybackState.Stopped)
-            {
-                InitializeStream(_audioFileReader.Volume);
-                InitializeOutput();
-                _output.Play();
-            }
-            else if (playbackState == PlaybackState.Paused)
+            if (playbackState == PlaybackState.Stopped || playbackState == PlaybackState.Paused)
             {
                 _output.Play();
             }
