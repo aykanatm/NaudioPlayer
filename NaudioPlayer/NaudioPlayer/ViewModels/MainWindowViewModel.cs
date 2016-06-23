@@ -25,16 +25,17 @@ namespace NaudioPlayer.ViewModels
 
         private PlaybackState _playbackState;
 
-        private readonly AudioPlayer _audioPlayer;
+        private AudioPlayer _audioPlayer;
 
         private string _title;
         private double _currentTrackLenght;
         private double _currentTrackPosition;
         private string _playPauseImageSource;
         private float _currentVolume;
-
-        private Track _currentTrack;
+        
         private ObservableCollection<Track> _playlist;
+        private Track _currentlyPlayingTrack;
+        private Track _currentlySelectedTrack;
 
         public string Title
         {
@@ -92,14 +93,26 @@ namespace NaudioPlayer.ViewModels
             }
         }
 
-        public Track CurrentTrack
+        public Track CurrentlySelectedTrack
         {
-            get { return _currentTrack; }
+            get { return _currentlySelectedTrack; }
             set
             {
-                if (Equals(value, _currentTrack)) return;
-                _currentTrack = value;
-                OnPropertyChanged(nameof(CurrentTrack));
+                if (Equals(value, _currentlySelectedTrack)) return;
+                _currentlySelectedTrack = value;
+                OnPropertyChanged(nameof(CurrentlySelectedTrack));
+            }
+        }
+
+        public Track CurrentlyPlayingTrack
+        {
+            get { return _currentlyPlayingTrack; }
+            set
+            {
+                if (Equals(value, _currentlyPlayingTrack)) return;
+                _currentlyPlayingTrack = value;
+                //PlayPauseImageSource = "../Images/play.png";
+                OnPropertyChanged(nameof(CurrentlyPlayingTrack));
             }
         }
 
@@ -141,15 +154,11 @@ namespace NaudioPlayer.ViewModels
             LoadCommands();
 
             Playlist = new ObservableCollection<Track>();
-
-            _audioPlayer = new AudioPlayer();
-            _audioPlayer.PlaybackPaused += _audioPlayer_PlaybackPaused;
-            _audioPlayer.PlaybackResumed += _audioPlayer_PlaybackResumed;
-            _audioPlayer.PlaybackStopped += _audioPlayer_PlaybackStopped;
+            
             _playbackState = PlaybackState.Stopped;
 
             PlayPauseImageSource = "../Images/play.png";
-            CurrentVolume = 100;
+            CurrentVolume = 1;
 
             var timer = new System.Timers.Timer();
             timer.Interval = 300;
@@ -180,6 +189,13 @@ namespace NaudioPlayer.ViewModels
             _playbackState = PlaybackState.Stopped;
             PlayPauseImageSource = "../Images/play.png";
             CommandManager.InvalidateRequerySuggested();
+            CurrentTrackPosition = 0;
+            
+            if (_audioPlayer.PlaybackStopType == AudioPlayer.PlaybackStopTypes.PlaybackStoppedReachingEndOfFile)
+            {
+                CurrentlySelectedTrack = Playlist.NextItem(CurrentlyPlayingTrack);
+                StartPlayback(null);
+            }
         }
 
         private void _audioPlayer_PlaybackResumed()
@@ -329,19 +345,35 @@ namespace NaudioPlayer.ViewModels
         {
             if (_playbackState == PlaybackState.Stopped)
             {
-                if (CurrentTrack != null)
+                if (CurrentlySelectedTrack != null)
                 {
-                    _audioPlayer.LoadFile(CurrentTrack.Filepath, CurrentVolume);
+                    _audioPlayer = new AudioPlayer(CurrentlySelectedTrack.Filepath, CurrentVolume);
+                    _audioPlayer.PlaybackPaused += _audioPlayer_PlaybackPaused;
+                    _audioPlayer.PlaybackResumed += _audioPlayer_PlaybackResumed;
+                    _audioPlayer.PlaybackStopped += _audioPlayer_PlaybackStopped;
                     CurrentTrackLenght = _audioPlayer.GetLenghtInSeconds();
+                    CurrentlyPlayingTrack = CurrentlySelectedTrack;
                 }
             }
-
+            if ((_playbackState == PlaybackState.Playing || _playbackState == PlaybackState.Paused) && CurrentlyPlayingTrack != CurrentlySelectedTrack)
+            {
+                StopPlayback(null);
+                if (CurrentlySelectedTrack != null)
+                {
+                    _audioPlayer = new AudioPlayer(CurrentlySelectedTrack.Filepath, CurrentVolume);
+                    _audioPlayer.PlaybackPaused += _audioPlayer_PlaybackPaused;
+                    _audioPlayer.PlaybackResumed += _audioPlayer_PlaybackResumed;
+                    _audioPlayer.PlaybackStopped += _audioPlayer_PlaybackStopped;
+                    CurrentTrackLenght = _audioPlayer.GetLenghtInSeconds();
+                    CurrentlyPlayingTrack = CurrentlySelectedTrack;
+                }
+            }
             _audioPlayer.TogglePlayPause(CurrentVolume);
         }
 
         private bool CanStartPlayback(object p)
         {
-            if (CurrentTrack != null)
+            if (CurrentlySelectedTrack != null)
             {
                 return true;
             }
@@ -350,7 +382,11 @@ namespace NaudioPlayer.ViewModels
 
         private void StopPlayback(object p)
         {
-            _audioPlayer.Stop();
+            if (_audioPlayer != null)
+            {
+                _audioPlayer.PlaybackStopType = AudioPlayer.PlaybackStopTypes.PlaybackStoppedByUser;
+                _audioPlayer.Stop();
+            }
         }
         private bool CanStopPlayback(object p)
         {
@@ -363,7 +399,10 @@ namespace NaudioPlayer.ViewModels
 
         private void ForwardToEnd(object p)
         {
-            _audioPlayer.SetPosition(_audioPlayer.GetLenghtInSeconds());
+            if (_audioPlayer != null)
+            {
+                _audioPlayer.SetPosition(_audioPlayer.GetLenghtInSeconds());
+            }
         }
         private bool CanForwardToEnd(object p)
         {
@@ -390,13 +429,19 @@ namespace NaudioPlayer.ViewModels
         // Events
         private void TrackControlMouseDown(object p)
         {
-            _audioPlayer.Pause();
+            if (_audioPlayer != null)
+            {
+                _audioPlayer.Pause();
+            }
         }
 
         private void TrackControlMouseUp(object p)
         {
-            _audioPlayer.SetPosition(CurrentTrackPosition);
-            _audioPlayer.Play(NAudio.Wave.PlaybackState.Paused, CurrentVolume);
+            if (_audioPlayer != null)
+            {
+                _audioPlayer.SetPosition(CurrentTrackPosition);
+                _audioPlayer.Play(NAudio.Wave.PlaybackState.Paused, CurrentVolume);
+            }
         }
 
         private bool CanTrackControlMouseDown(object p)
@@ -419,7 +464,10 @@ namespace NaudioPlayer.ViewModels
 
         private void VolumeControlValueChanged(object p)
         {
-            _audioPlayer.SetVolume(CurrentVolume);
+            if (_audioPlayer != null)
+            {
+                _audioPlayer.SetVolume(CurrentVolume);
+            }
         }
 
         private bool CanVolumeControlValueChanged(object p)
