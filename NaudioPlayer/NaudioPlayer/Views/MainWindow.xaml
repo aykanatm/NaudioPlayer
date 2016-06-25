@@ -74,6 +74,14 @@
                 </i:Interaction.Triggers>
             </Slider>
         </Grid>
+        <Grid DockPanel.Dock="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Now playing: "></TextBlock>
+            <TextBlock Grid.Column="1" Text="{Binding CurrentlyPlayingTrack.FriendlyName, Mode=OneWay}"/>
+        </Grid>
         <ListView x:Name="Playlist" ItemsSource="{Binding Playlist}" SelectedItem="{Binding CurrentlySelectedTrack, Mode=TwoWay}">
             <ListView.ItemTemplate>
                 <DataTemplate>
