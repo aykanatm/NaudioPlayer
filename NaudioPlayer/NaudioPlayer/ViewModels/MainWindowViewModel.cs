@@ -111,7 +111,6 @@ namespace NaudioPlayer.ViewModels
             {
                 if (Equals(value, _currentlyPlayingTrack)) return;
                 _currentlyPlayingTrack = value;
-                //PlayPauseImageSource = "../Images/play.png";
                 OnPropertyChanged(nameof(CurrentlyPlayingTrack));
             }
         }
@@ -199,9 +198,12 @@ namespace NaudioPlayer.ViewModels
                 CurrentlySelectedTrack = Playlist.NextItem(CurrentlyPlayingTrack);
                 StartPlayback(null);
             }
-            else if (_audioPlayer.PlaybackStopType == AudioPlayer.PlaybackStopTypes.PlaybackStoppedToPlayAnotherFile)
+            else if (_audioPlayer.PlaybackStopType == AudioPlayer.PlaybackStopTypes.PlaybackStoppedByUser)
             {
-                StartPlayback(null);
+                if (CurrentlySelectedTrack != CurrentlyPlayingTrack)
+                {
+                    StartPlayback(null);
+                }
             }
         }
 
@@ -356,6 +358,7 @@ namespace NaudioPlayer.ViewModels
         {
             if (CurrentlySelectedTrack != null)
             {
+                // If we are selecting the clip that is playing, just do play/pause otherwise create a new AudioPlayer to play another clip
                 if (CurrentlyPlayingTrack != CurrentlySelectedTrack)
                 {
                     if (CurrentlyPlayingTrack == null || _playbackState == PlaybackState.Stopped)
@@ -372,18 +375,45 @@ namespace NaudioPlayer.ViewModels
                     {
                         if (_audioPlayer != null)
                         {
-                            _audioPlayer.PlaybackStopType = AudioPlayer.PlaybackStopTypes.PlaybackStoppedToPlayAnotherFile;
-                            _audioPlayer.Stop();
+                            StopPlayback(null);
                             // This is here to stop stuttering of audio while one clip ends other begins
                             Thread.Sleep(500);
                         }
                     }
                 }
-
+                if (_playbackState == PlaybackState.Stopped)
+                {
+                    _audioPlayer = new AudioPlayer(CurrentlySelectedTrack.Filepath, CurrentVolume);
+                    _audioPlayer.PlaybackStopType = AudioPlayer.PlaybackStopTypes.PlaybackStoppedReachingEndOfFile;
+                    _audioPlayer.PlaybackPaused += _audioPlayer_PlaybackPaused;
+                    _audioPlayer.PlaybackResumed += _audioPlayer_PlaybackResumed;
+                    _audioPlayer.PlaybackStopped += _audioPlayer_PlaybackStopped;
+                    CurrentTrackLenght = _audioPlayer.GetLenghtInSeconds();
+                    CurrentlyPlayingTrack = CurrentlySelectedTrack;
+                }
                 _audioPlayer.TogglePlayPause(CurrentVolume);
             }
         }
-
+        //private void StartPlayback(object p)
+        //{
+        //    if (CurrentlySelectedTrack != null)
+        //    {
+        //        if (_playbackState == PlaybackState.Stopped)
+        //        {
+        //            _audioPlayer = new AudioPlayer(CurrentlySelectedTrack.Filepath, CurrentVolume);
+        //            _audioPlayer.PlaybackStopType = AudioPlayer.PlaybackStopTypes.PlaybackStoppedReachingEndOfFile;
+        //            _audioPlayer.PlaybackPaused += _audioPlayer_PlaybackPaused;
+        //            _audioPlayer.PlaybackResumed += _audioPlayer_PlaybackResumed;
+        //            _audioPlayer.PlaybackStopped += _audioPlayer_PlaybackStopped;
+        //            CurrentTrackLenght = _audioPlayer.GetLenghtInSeconds();
+        //            CurrentlyPlayingTrack = CurrentlySelectedTrack;
+        //        }
+        //        if (CurrentlySelectedTrack == CurrentlyPlayingTrack)
+        //        {
+        //            _audioPlayer.TogglePlayPause(CurrentVolume);
+        //        }
+        //    }
+        //}
         private bool CanStartPlayback(object p)
         {
             if (CurrentlySelectedTrack != null)
@@ -429,7 +459,7 @@ namespace NaudioPlayer.ViewModels
 
         private void Shuffle(object p)
         {
-            
+            Playlist = Playlist.Shuffle();
         }
         private bool CanShuffle(object p)
         {
