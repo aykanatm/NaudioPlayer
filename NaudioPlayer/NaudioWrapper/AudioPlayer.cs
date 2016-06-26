@@ -7,7 +7,7 @@ namespace NaudioWrapper
     {
         public enum PlaybackStopTypes
         {
-            PlaybackStoppedByUser, PlaybackStoppedReachingEndOfFile, PlaybackStoppedToPlayAnotherFile
+            PlaybackStoppedByUser, PlaybackStoppedReachingEndOfFile
         }
 
         public PlaybackStopTypes PlaybackStopType { get; set; }
